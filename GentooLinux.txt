@@ -1,0 +1,431 @@
+# From The Beginning To The End
+# Gentoo Linux
+
+
+# 1. Installation
+	# see Gentoo Handbook at https://wiki.gentoo.org/wiki/Handbook:Main_Page
+	## check integrity
+		gpg --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 0xBB572E0E2D182910
+		wget -O- https://gentoo.org/.well-known/openpgpkey/hu/wtktzo4gyuhzu8a4z5fdj3fgmr1u6tob?l=releng | gpg --import
+		gpg --verify install-amd64-minimal-20141204.iso.DIGESTS.asc
+	# boot
+	# use "links https://wiki.gentoo.org/wiki/Handbook" for manual
+	## set up locale settings
+		loadkeys us
+		date <MMDDhhmmYYYY>
+		ntpd -q -g
+	## set up network
+		ip addr # or "ifconfig -a" to see network interfaces
+		ip link set <interface> up # or "ifconfig <interface> up" to set the interface up
+		### wired connection
+			dhcpcd -HD <interface>
+		### wired or wireless connection
+			net-setup <interface>
+		### PPPoE
+			pppoe-setup
+			pppoe-start
+		### PPTP
+			nano -w /etc/ppp/chap-secrets
+			nano -w /etc/ppp/options.pptp
+			pptp <server>
+		# or setup manually with ip, ifconfig, route and other utilities
+	## disk partitioning
+		# use cfdisk, fdisk or gdisk
+		# create BIOS partition (2 MiB) for BIOS MBR (if 512 B for MBR isn't enough)
+		# create BIOS partition (bios_grub flag, 2 MiB) for BIOS GPT (if 512 B for MBR isn't enough)
+		# create EFI partition (/boot/efi, EFI type, 256 MiB, FAT32) for UEFI GPT
+		# you can also create EFI partition in BIOS MBR partitioning and BIOS GPT for ability to migrate to UEFI GPT
+		# you can also create BIOS partition in UEFI GPT partitioning for ability to BIOS Legacy boot
+		# create swap ([SWAP], linux swap type, RAM size) and root (/, linux type) partitions
+		mkswap <swap_partition>
+		swapon <swap_partition>
+		# create root partition
+		mkfs.ext4 <root_partition>
+		mount <root_partition> /mnt/gentoo/ # NOT TO /mnt/
+		# mount EFI partition
+		mkfs.fat -F32 <EFI_partition>
+		mkdir -p /mnt/gentoo/boot/efi/
+		mount <EFI_partition> /mnt/gentoo/boot/efi/
+	## installing system
+		cd /mnt/gentoo/
+		### Stage 3 archive
+			links https://www.gentoo.org/downloads/#other-arches # download Stage 3 archive and other needed files
+			openssl dgst -r -sha512 stage3-amd64-<release>.tar.xz # calculate and verify SHA512 sum
+			sha512sum stage3-amd64-<release>.tar.xz # calculate and verify SHA512 sum
+			openssl dgst -r -whirlpool stage3-amd64-<release>.tar.xz # calculate and verify Whirlpool
+			gpg --verify stage3-amd64-<release>.tar.xz{.DIGESTS.asc,} # verify GPG signature
+			tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner # unpack tarball
+			rm stage3-*
+		### Portage configuring
+			nano -w /mnt/gentoo/etc/portage/make.conf <# add next
+				COMMON_FLAGS="-march=native -O2 -pipe"
+				MAKEOPTS="-j<jobs_number>" # where <jobs_number> is the smaller of the two numbers: integer RAM divided by 2GiB and logical processors count plus one
+				USE="<USE_flags>" # see package.use manual
+			#>
+			mirrorselect -i -o >> /mnt/gentoo/etc/portage/make.conf
+			mkdir -p /mnt/gentoo/etc/portage/repos.conf/
+			cp /mnt/gentoo/usr/share/portage/config/repos.conf /mnt/gentoo/etc/portage/repos.conf/gentoo.conf
+		### DNS settings copy
+			cp --dereference /etc/resolv.conf /mnt/gentoo/etc/
+		### chrooting
+			mount --types proc /proc/ /mnt/gentoo/proc/
+			mount --rbind /sys/ /mnt/gentoo/sys/
+			mount --make-rslave /mnt/gentoo/sys/
+			mount --rbind /dev/ /mnt/gentoo/dev/
+			mount --make-rslave /mnt/gentoo/dev/
+			mkdir -p /mnt/gentoo/run/udev/
+			mount -o bind /run/udev/ /mnt/gentoo/run/udev/
+			mount --make-rslave /mnt/gentoo/run/udev/
+			chroot /mnt/gentoo/ /bin/bash
+			source /etc/profile
+			export PS1="(chroot) ${PS1}"
+		### installation using Portage
+			emerge-webrsync # installs recent ebuild repository snapshot (recent up to 24 hours), recommended for strict firewall
+			emerge --sync # installs recent ebuild repository snapshot (recent up to 1 hour)
+			eselect news list # shows list of news about installed packages
+			eselect news read <message_number> # shows news about installed packages
+			eselect profile list # shows available Portage profiles
+			eselect profile set <profile_number> # sets Portage profile
+			emerge --ask --verbose --update --deep --newuse @world # updates world (system + selected) set for current profile
+		### kernel compiling
+			emerge --ask sys-kernel/genkernel
+			emerge --ask sys-kernel/linux-firmware
+			#### manually
+				emerge --ask sys-kernel/gentoo-sources # installs sources of Gentoo version of Linux kernel
+				emerge --ask sys-apps/pciutils sys-apps/usbutils
+				lspci # see PCI devices for kernel configuration
+				lsusb # see USB devices for kernel configuration
+				lsmod # see kernel modules for kernel configuration
+				cd /usr/src/linux/
+				make menuconfig # configure Linux kernel for your needs
+				make -j<jobs_number> # compile Linux kernel
+				make modules_install && make install # install kernel modules and the kernel itself
+				genkernel --install --kernel-config=/usr/src/linux/.config initramfs # makes and installs initramfs
+			#### automatically
+				genkernel all
+		### filesystem table
+			nano -w /etc/fstab <# add next
+				<partition_id> <mount_point> <filesystem> <mount_options_separated_by_comma> <dump_boolean> <order_to_fsck>
+			#>
+		### installing tools
+			emerge --ask app-admin/sysklogd # you can install app-admin/syslog-ng or app-admin/metalog instead
+			rc-update add sysklogd default
+			emerge --ask sys-apps/mlocate
+			emerge --ask sys-fs/e2fsprogs sys-fs/dosfstools sys-fs/ntfs3g
+			emerge --ask net-misc/dhcpcd net-dialup/ppp net-wireless/iw net-wireless/wpa_supplicant net-misc/networkmanager net-misc/netifrc
+			emerge --ask sys-apps/pcmciautils
+			rc-update add NetworkManager default
+		### installing bootloader
+			nano -w /etc/portage/make.conf # add 'GRUB_PLATFORMS="efi-64"'
+			emerge --ask --verbose sys-boot/grub:2 sys-boot/efibootmgr sys-boot/os-prober
+			grub-install <disk> # for BIOS
+			grub-install --target=x86_64-efi --efi-directory=/boot/efi --recheck --removable --debug # for UEFI
+			nano -w /etc/default/grub # configure for your needs
+			grub-mkconfig -o /boot/grub/grub.cfg
+	## locale settings
+		ls /usr/share/zoneinfo/ # shows available time zones
+		echo "<region>/<city>" > /etc/timezone # sets time zone
+		emerge --config sys-libs/timezone-data # updates time zone
+		nano -w /etc/locale.gen # add "en_US.UTF-8 UTF-8" and "uk_UA.UTF-8 UTF-8"
+		locale-gen # generates selected locales
+		emerge --ask media-fonts/terminus-font
+		nano -w /etc/env.d/02locale <# add next
+			LOCALE="uk_UA.UTF-8" # you can also set "uk_UA.utf-8" and "uk_UA.utf8"
+			LANG="uk_UA.UTF-8"
+		#>
+		nano -w /etc/conf.d/consolefont # set 'consolefont' to "ter-v16n" "ter-v16b"
+		nano -w /etc/conf.d/keymaps <# add next
+			keymap="us"
+			keymap="ua-cp1251"
+		#>
+		nano -w /etc/conf.d/hwclock <# add next
+			clock="UTC"
+		#>
+		rc-update add consolefont boot
+		env-update && source /etc/profile && export PS1="(chroot) ${PS1}" # updates chroot locale
+	## host settings
+		nano -w /etc/conf.d/hostname <# add next
+			hostname="<host_name>"
+		#>
+		nano -w /etc/hosts <# add next
+			127.0.0.1 <host_name>.<domain_name> <host_name> localhost
+			::1 <host_name>.<domain_name> <host_name> localhost
+		#>
+	## protect superuser
+		passwd <password> # set password for root user
+	## rebooting
+		exit
+		umount -R /mnt/gentoo/
+		reboot
+#
+
+# 2. Setting up
+	## adding user
+		useradd -m -G users,wheel,audio -s /bin/bash <user>
+		passwd <user>
+		emerge --ask app-admin/sudo
+		nano /etc/sudoers # add "<user> ALL=(ALL) ALL" to give user privileged rights
+	## start networking at boot
+		cd /etc/init.d/
+		ln -s net.lo net.<interface> # adding the interface to the Netifrc framework
+		rc-update add net.<interface> default
+		# use /etc/conf.d/net for advanced settings
+	## Portage
+		emerge --ask app-portage/gentoolkit
+		emerge --ask app-eselect/eselect-repository
+		emerge --ask app-portage/layman
+		### distcc
+			emerge --ask sys-devel/distcc
+			nano /etc/portage/make.conf <# add next
+				MAKEOPTS="-j<jobs_number_total> -l<jobs_number_local>"
+				FEATURES="distcc"
+			#>
+			#### ccache support
+				nano /etc/conf.d/distccd <# add next
+					PATH="/usr/lib/ccache/bin:${PATH}"
+					CCACHE_PREFIX="distcc"
+				#>
+				nano /etc/env.d/03distcc_ccache <# add next
+					CCACHE_DIR="/var/cache/ccache"
+					DISTCC_DIR="/var/tmp/portage/.distcc"
+				#>
+				cd "/var/cache/ccache/"
+				mkdir {a..z} {0..9} tmp
+				for first_level_directory in $(find . -maxdepth 1 -type d -not -name "." -and -not -name "tmp"); do pushd "${first_level_directory}" >/dev/null; mkdir {a..z} {0..9}; popd >/dev/null; done
+				find /var/cache/ccache -type d -exec chown distcc:portage "{}" +
+			distcc-config --set-hosts "<distccd_hosts'_IPs_space_separated>"
+			rc-update add distccd default
+		### ccache
+			emerge --ask dev-util/ccache
+			nano /etc/portage/make.conf <# add next
+				FEATURES="ccache"
+				CCACHE_SIZE="2G"
+			#>
+			nano /var/cache/ccache/ccache.conf <# add next
+				compression = true
+				compression_level = 1
+			#>
+	## graphics and sound drivers and libraries
+		### Intel, AMD and Nvidia GPUs
+			emerge --ask x11-drivers/xf86-video-amdgpu
+			emerge --ask x11-drivers/nvidia-drivers
+			nano /etc/modules-load.d/nvidia.conf # add 'nvidia'
+			rc-update add modules boot
+			nano /etc/portage/make.conf <# add next
+				VIDEO_CARDS="amdgpu radeonsi intel i915 i965 iris nvidia"
+			#>
+			emerge --ask media-libs/mesa
+			emerge --ask media-libs/vulkan-loader
+			emerge --ask media-libs/openal
+			#### optimus-manager
+				emerge --ask x11-misc/optimus-manager
+				nano /etc/sddm.conf # comment 'DisplayCommand' and 'DisplayStopCommand'
+				rc-update add optimus-manager default
+				optimus-manager --switch <intel|nvidia|hybrid|auto> # switch graphics card
+				optimus-manager --set-startup <intel|nvidia|hybrid|auto> # switch graphics card on startup
+		### ALSA and PulseAudio
+			emerge --ask media-libs/alsa-lib
+			emerge --ask media-sound/alsa-utils
+			emerge --ask media-sound/pulseaudio
+			# enable 'alsa' and 'pulseaudio' global USE flags
+			#### bluetooth
+				emerge --ask media-sound/bluez-alsa
+		### tools
+			emerge --ask media-video/vlc
+			emerge --ask media-video/ffmpeg
+			emerge --ask media-video/v4l2loopback
+			emerge --ask media-gfx/eog
+	## General Purpose Mouse
+		emerge --ask sys-libs/gpm
+		nano /etc/conf.d/gpm # configure for your needs
+		rc-update add gpm default
+	## Graphical environment
+		### Xorg
+			emerge --ask x11-base/xorg-drivers
+			emerge --ask x11-base/xorg-x11
+			usermod -a -G video <user> # if you want to run Xorg-server manually
+		### SDDM
+			emerge --ask x11-misc/sddm
+			nano /etc/conf.d/display-manager <# add next
+				CHECKVT=7
+				DISPLAYMANAGER="sddm"
+			#>
+			nano /etc/conf.d/xdm <# add next
+				CHECKVT=7
+				DISPLAYMANAGER="sddm"
+			#>
+			rc-update add xdm default
+			usermod -a -G video sddm
+		### KDE Plasma
+			emerge --ask sys-auth/elogind
+			emerge --ask sys-fs/eudev
+			emerge --ask sys-apps/dbus
+			emerge --ask sys-auth/polkit
+			emerge --ask sys-fs/udisks
+			emerge --ask kde-plasma/plasma-meta
+			emerge --ask kde-apps/kde-apps-meta
+	## digital signature utilities
+		### GnuPG
+			emerge --ask app-crypt/gnupg
+		### SSL
+			emerge --ask dev-libs/openssl
+	## SSH
+		emerge --ask net-misc/openssh
+		nano /etc/ssh/ssh_config
+		nano /etc/ssh/sshd_config
+		rc-update add sshd default
+	## development kit
+		### languages
+			emerge --ask sys-devel/gcc sys-devel/libtool sys-devel/llvm sys-devel/clang sys-devel/gdb
+			emerge --asl dev-lang/nasm sys-devel/binutils
+			emerge --ask dev-lang/python dev-python/pip
+			eselect repository enable dlang && emerge --sync dlang && layman -f -a dlang
+			emerge --ask dev-lang/rust
+			emerge --ask dev-lang/ghc
+			emerge --ask dev-lang/gnat-gpl
+			emerge --ask dev-lang/erlang
+			emerge --ask dev-lang/lua
+			emerge --ask dev-lang/perl
+			emerge --ask dev-lang/ruby
+		### build systems
+			emerge --ask sys-devel/make dev-util/cmake dev-util/scons dev-java/gradle-bin
+		### text editors
+			emerge --ask app-editors/emacs app-editors/vim app-editors/nano app-editors/notepadqq
+		### IDEs
+			emerge --ask app-editors/visual-studio-code dev-qt/qt-creator dev-util/kdevelop
+		### utilities
+			emerge --ask dev-vcs/git
+	## other
+		### utilities
+			emerge --ask sys-process/htop
+			emerge --ask app-misc/mc
+			emerge --ask app-misc/tmux
+			emerge --ask virtual/cron # or sys-process/vixie-cron, sys-process/cronie, sys-process/dcron, sys-process/fcron, sys-process/bcron
+			emerge --ask sys-apps/coreutils # for dd
+			emerge --ask sys-apps/util-linux sys-apps/gptfdisk sys-block/parted sys-block/gparted # for cfdisk, fdisk, gdisk, parted and gparted
+		### CLI web browsers
+			emerge --ask www-client/links www-client/w3m www-client/chromium www-client/firefox
+		### instant messengers
+			emerge --ask net-im/telegram-desktop net-im/viber net-im/discord-bin
+		### remote desktop clients
+			emerge --ask net-misc/remmina net-misc/teamviewer
+		### emulation
+			emerge --ask virtual/wine # or app-emulation/wine-vanilla, app-emulation/wine-staging, app-emulation/wine-d3d9, app-emulation/wine-any
+			emerge --ask games-emulation/dosbox
+			emerge --ask games-emulation/dolphin
+		### Java
+			emerge --ask dev-java/openjdk-bin dev-java/openjdk-jre-bin
+		### Steam
+			wget -P /etc/portage/repos.conf/ https://raw.githubusercontent.com/anyc/steam-overlay/master/steam-overlay.conf
+			emaint sync --repo steam-overlay
+			eselect repository enable steam-overlay
+			layman -f
+			layman -a steam-overlay
+			emerge --ask games-util/steam-meta
+		### Plymouth
+			emerge --ask sys-boot/plymouth sys-boot/plymouth-openrc-plugin
+			nano /etc/genkernel.conf <# add next
+				SPLASH="no"
+				PLYMOUTH="yes"
+				PLYMOUTH_THEME="solar"
+			#>
+			nano /etc/rc.conf <# add next
+				rc_interactive="NO"
+			#>
+			nano /etc/default/grub <# add next
+				GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
+			#>
+			# regenerate initramfs and bootloader configuration
+	## suspend and hibernate
+		emerge --ask sys-power/suspend sys-power/upower
+		nano /etc/default/grub # add 'GRUB_CMDLINE_LINUX_DEFAULT="resume=<SWAP>"' and regenerate configuration
+		loginctl suspend # to suspend
+		loginctl hibernate # to hibernate
+	## advanced networking
+		### iptables
+			emerge --ask net-firewall/iptables
+			rc-update add iptables default
+		### tor
+			emerge --ask net-vpn/tor
+			nano /etc/tor/torrc # configure for your needs
+			rc-update add tor default
+			#### proxychains
+				emerge --ask net-proxy/torsocks net-misc/proxychains
+				nano /etc/proxychains.conf # decomment 'dynamic_chain' and comment 'strict_chain', change 'socks4' to 'socks5'
+				proxychains <program> # usage
+			#### torify system
+				nano /etc/tor/torrc <# add next
+					TransPort 9040
+					DNSPort 9053
+					AutomapHostsOnResolve 1
+					AutomapHostsSuffixes .exit,.onion
+					ControlPort 9051
+				#>
+				rc-service restart tor
+				sleep 5
+				iptables -t nat -A OUTPUT -p udp -m udp --dport 53 -j REDIRECT --to-ports 9053
+				iptables -t nat -A OUTPUT -p tcp -m tcp --tcp-flags FIN,SYN,RST,ACK SYN -j REDIRECT --to-ports 9040
+		### IPv6
+			emerge --ask net-misc/miredo
+			rc-update add miredo default
+	## virtualization
+		### Qemu
+			emerge --ask app-emulation/qemu
+			#### Hypervisors
+				##### KVM
+					LC_ALL=C lscpu | grep Virtualization # if nothing is displayed your processor does not support hardware virtualization
+					grep -E "vmx|svm" /proc/cpuinfo # if nothing is displayed your processor does not support hardware virtualization
+					zgrep CONFIG_KVM /proc/config.gz # if KVM has 'y' or 'm' mark your kernel supports KVM
+					usermod -a -G kvm <user> # to allow the user to run KVM accelerated virtual machines
+				##### Xen
+					# KVM needed
+					emerge --ask app-emulation/xen app-emulation/xen-tools
+					nano /etc/xen/grub.conf <# add next
+						GRUB_CMDLINE_XEN="console_timestamps=boot"
+						GRUB_CMDLINE_XEN_DEFAULT="dom0_mem=1024M,max:1024M"
+						GRUB_CMDLINE_LINUX_XEN_REPLACE_DEFAULT="softlevel=xen"
+					#>
+					install -d /etc/runlevels/xen
+					rc-update -s add default xen
+					rc-update add xencommons xen
+					rc-update add xenconsoled xen
+					rc-update add xendomains xen
+					rc-update add xenstored xen
+					rc-update add xen-watchdog xen
+					# reboot
+					xl list # there must be dom0 host runned
+			#### GUI (virt-manager)
+				emerge --ask app-emulation/virt-manager
+				usermod -a -G libvirt <user> # to allow the user to use virt-manager
+				rc-update add libvirtd default
+#
+
+# 3. Using
+	## Portage
+		man portage
+		info portage
+		man make.conf
+		info make.conf
+		man emerge
+		man ebuild
+		man equery
+		nano /etc/portage/package.use/<settings_file> # configure USE flags for special packages
+		nano /etc/portage/package.license # configure licenses for special packages
+		ls -al /var/db/repos/gentoo # contains Portage profiles and ebuild repository
+		emerge --info --verbose # emerge information
+		emerge --ask <package> # install package
+		emerge --ask --deselect <package> && emerge --ask --update --deep --with-bdeps=y --newuse @world && emerge --ask --depclean # remove package with it's dependencies
+		emerge --sync && emerge --ask --update --deep --with-bdeps=y --newuse @world # upgrade system
+		man dispatch-conf
+		man etc-update
+	## OpenRC
+		man openrc
+		info openrc
+		nano /etc/rc.conf # configure OpenRC
+		nano /etc/inittab # configure Init process
+		nano /etc/runlevels/<runlevel_file> # configure runlevel
+#
+
+
+# Malovanyi Denys Olehovych (21.11.2003, Vinnytsia, Ukraine)
+# Since November 2020.

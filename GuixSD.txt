@@ -1,0 +1,89 @@
+# From The Beginning To The End
+# Guix System Distribution
+
+
+# 1. Installation
+	# see GNU Guix Reference Manual at https://guix.gnu.org/manual/en/html_node/index.html
+	## check integrity
+		wget https://ftp.gnu.org/gnu/guix/guix-system-install-1.1.0.system.iso.xz.sig
+		gpg --verify guix-system-install-1.1.0.system.iso.xz.sig
+	# boot
+	# press ctrl+alt+f1 for graphical installation, ctrl+alt+f2 for manual and ctrl+alt+<from_f3_to_f6> for other TTYs
+	## set up locale settings
+		loadkeys us
+		date <MMDDhhmmYYYY>
+	## set up network
+		ip address # or "ifconfig -a" to see network interfaces
+		ip link set <interface> up # or "ifconfig <interface> up" to set the interface up
+		### wired connection
+			dhclient -v <interface>
+		### wireless connection
+			nano wpa_supplicant.conf <# add next
+				network={
+					ssid="<SSID>"
+					key_mgmt=WPA-PSK
+					psk="<password>"
+				}
+			#>
+			wpa_supplicant -c wpa_supplicant.conf -i <interface> -B
+	## disk partitioning
+		# use cfdisk, fdisk or gdisk
+		# create BIOS partition (2 MiB) for BIOS MBR (if 512 B for MBR isn't enough)
+		# create BIOS partition (bios_grub flag, 2 MiB) for BIOS GPT (if 512 B for MBR isn't enough)
+		# create EFI partition (/boot/efi, EFI type, 256 MiB, FAT32) for UEFI GPT
+		# you can also create EFI partition in BIOS MBR partitioning and BIOS GPT for ability to migrate to UEFI GPT
+		# you can also create BIOS partition in UEFI GPT partitioning for ability to BIOS Legacy boot
+		# create swap ([SWAP], linux swap type, RAM size) and root (/, linux type) partitions
+		mkswap <swap_partition>
+		swapon <swap_partition>
+		# create root partition
+		mkfs.ext4 <root_partition>
+		mount <root_partition> /mnt/
+		mkdir -p /mnt/boot/efi/
+		mount <EFI_partition> /mnt/boot/efi # if you have UEFI/GPT system
+	## installing packages
+		herd start cow-store /mnt/
+		mkdir /mnt/etc/
+		cp /etc/configuration/desktop.scm /mnt/etc/config.scm
+		nano /mnt/etc/config.scm # configure to your needs
+		guix system init /mnt/etc/config.scm /mnt/
+	## host settings
+		nano /mnt/etc/hostname # write your host name
+		nano /mnt/etc/hosts <# write
+			127.0.0.1 localhost
+			::1 localhost
+			127.0.1.1 <hostname>.localdomain <hostname> # or static ip adress
+		#>
+#
+
+# 2. Setting up
+	## protect superuser
+		passwd <password> # set password for root user
+	## adding user
+		useradd -m <user>
+		passwd <user>
+		nano /etc/sudoers # add "<user> ALL=(ALL) ALL" to give user privileged rights
+#
+
+# 3. Using
+	## Guix
+		guix --help
+		man guix
+		info guix
+		### upgrading the system
+			sudo -i guix pull
+			sudo -i guix system reconfigure /etc/config.scm
+	## Shepherd
+		shepherd --help
+		herd --help
+		man shepherd
+		man herd
+		info shepherd
+		info herd
+	## building the installation image
+		guix system disk-image --file-system-type=iso9660 gnu/system/install.scm
+#
+
+
+# Malovanyi Denys Olehovych (21.11.2003, Vinnytsia, Ukraine)
+# Since November 2020.
