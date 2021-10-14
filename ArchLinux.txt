@@ -225,15 +225,16 @@
 		### build systems
 			pacman -S make cmake scons gradle
 		### text editors
-			pacman -S emacs vim
 			pacman -S notepadqq # Qt clone of Notepad++
 		### IDEs
+			pacman -S emacs vim
 			pacman -S code # or install from AUR (visual-studio-code-bin)
-			pacman -S qt5 qtcreator kdevelop
-			pacman -S processing
-			pacman -S arduino arduino-docs arduino-avr-core
+			pacman -S kdevelop qt5 qtcreator
 			sasm # install from AUR
+			pacman -S arduino arduino-docs arduino-avr-core
+			pacman -S processing
 		### utilities
+			pacman -S valgrind cscope perf strace pahole
 			pacman -S git
 			pacman -S distcc ccache
 			oclint # install from AUR
