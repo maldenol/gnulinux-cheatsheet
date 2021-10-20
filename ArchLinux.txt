@@ -21,7 +21,7 @@
 			# create EFI partition (/boot/efi, EFI type, 256 MiB, FAT32) for UEFI GPT
 			# you can also create EFI partition in BIOS MBR partitioning and BIOS GPT for ability to migrate to UEFI GPT
 			# you can also create BIOS partition in UEFI GPT partitioning for ability to BIOS Legacy boot
-			# create swap ([SWAP], linux swap type, RAM size) and root (/, linux type) partitions
+			# create swap ([SWAP], linux swap type, RAM size, optional) and root (/, linux type) partitions
 			mkfs.ext4 /dev/sdXY # where sdXY is partition for linux
 		### hybrid UEFI GPT + BIOS GPT/MBR boot
 			# create GPT partition table (ALL DATA WILL BE LOST)
@@ -29,11 +29,17 @@
 			gdisk # enter 'r', 'h', '1 2 3', 'N', '', 'N', '', 'N', '', 'Y', 'x', 'h', 'w', 'Y'
 			mkfs.fat -F32 /dev/sdX2
 			mkfs.ext4 /dev/sdX3
-		### swap
-			mkswap /dev/sdXZ # where sdXZ is partition for linux swap
-			swapon /dev/sdXZ
 	## mounting root filesystem
 		mount /dev/sdXY /mnt
+	## swap (optional)
+		### as file
+			dd if=/dev/zero of=/mnt/swapfile bs=1MiB count=<RAM_size_in_MiB> status=progress && sync
+			chmod 600 /mnt/swapfile
+			mkswap /mnt/swapfile
+			swapon /mnt/swapfile
+		### as partition
+			mkswap /dev/sdXZ # where sdXZ is partition for linux swap
+			swapon /dev/sdXZ
 	## installing packages
 		nano /etc/pacman.conf # decomment '[multilib]' and 'Include = /etc/pacman.d/mirrorlist'
 		nano /etc/pacman.d/mirrorlist # move the server nearest you to the top
@@ -214,14 +220,15 @@
 			pacman -S gcc gdb
 			pacman -S nasm binutils
 			pacman -S python python-pip
-			pacman -S dlang-dmd dtools gdc
 			pacman -S rust
+			pacman -S dlang-dmd dtools gdc
 			pacman -S ghc
 			pacman -S gcc-ada
 			pacman -S erlang
 			pacman -S lua
 			pacman -S perl
 			pacman -S ruby
+			pacman -S android-tools android-udev
 		### build systems
 			pacman -S make cmake scons gradle
 		### text editors
