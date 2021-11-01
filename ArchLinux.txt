@@ -134,7 +134,7 @@
 		pacman -S powerdevil plasma-nm plasma-browser-integration kwalletmanager kaccounts-providers packagekit-qt5 discover kmix spectacle kdeconnect
 		pacman -S sddm sddm-kcm
 		systemctl enable --now sddm
-		# you can also use MATE, Cinnamon, Openbox or anything else instead of KDE Plasma
+		# you can also use Xfce, Openbox or anything else instead of KDE Plasma
 	## security
 		pacman -S iptables
 		systemctl enable --now iptables
@@ -281,10 +281,10 @@
 		pacman -S htop tiptop perf iotop strace lsof
 		pacman -S mc
 		pacman -S tmux
-		pacman -S cron # run service
 		pacman -S util-linux gdisk parted gparted
 		pacman -S curl wget
 		pacman -S w3m links
+		pacman -S cron # run service
 		pacman -S thunderbird notmuch
 		pacman -S transmission-qt ktorrent
 		pacman -S translate-shell # usage trans
@@ -296,6 +296,10 @@
 		pacman -S chntpw flashrom
 		toilet # install from AUR
 		pacman -S cmatrix
+		### secure erasing
+			pacman -S coreutils # for shred
+			pacman -S wipe
+			secure-delete # install from AUR
 		### web
 			pacman -S chromium firefox
 			pacman -S telegram-desktop
@@ -348,6 +352,7 @@
 			#### Steam
 				pacman -S steam
 				SteamOS compositor # install from AUR (steamos-compositor-plus)
+				steamcmd # install from AUR
 			pacman -S dwarffortress
 			pacman -S bsd-games
 			pacman -S aisleriot
@@ -418,10 +423,12 @@
 			#### GUI
 				##### virt-manager
 					pacman -S libvirt virt-manager
+					pacman -S iptables-nft dnsmasq
+					nano /etc/libvirt/qemu.conf # decomment user and group variables if permission error happens
 				##### aqemu
 					aqemu # install from AUR
-			# for Internet access add nic and user network devices
-			# you can use linux KVM hypervisor or standart TCG accelerator in QEMU
+					# for Internet access add nic and user network devices
+					# you can use linux KVM hypervisor or standart TCG accelerator in QEMU
 	## cracking and network tools
 		### sniffing and not only
 			pacman -S scapy # or python-scapy
@@ -461,6 +468,8 @@
 				carml monitor -v -o
 		### IPv6
 			miredo # install from AUR # run miredo daemon
+		### MAC address changing
+			pacman -S macchanger
 		### Metasploit Project
 			# install PostgreSQL and Ruby
 			#### Ruby configuration for Metasploit
@@ -487,6 +496,16 @@
 				db_rebuild_cache
 				db_status
 				exit
+		### BlackArch
+			curl -O https://blackarch.org/strap.sh # download the script
+			echo 46f035c31d758c077cce8f16cf9381e8def937bb strap.sh | sha1sum -c # verify the script signature
+			chmod +x strap.sh # make the script executable
+			sudo sh strap.sh # execute the script
+			pacman -Syu # update repositories' info
+			sudo pacman -Sgg | grep blackarch | cut -d' ' -f2 | sort -u # list packages from the BlackArch repository
+			sudo pacman -Sg | grep blackarch # list package groups from the BlackArch repository
+			sudo pacman -S blackarch-<category> # install specified package category from the BlackArch repository
+			sudo pacman -S blackarch # install all packages from the BlackArch repository
 #
 
 
@@ -520,12 +539,10 @@
 		### show filtered command output
 			<application> | grep <pattern>
 		### login as another user
-			sudo su # as root
-			sudo su <user> # as <user>
+			sudo su # login as root
+			sudo su <user> # login as <user>
 		### text editors
 			nano <file> # tiny text editor
-			vim <file> # smart ide in console
-			emacs <file> # smart ide in console
 			cat <file> # print text to console
 			od <file> # print symbols to console
 		### archiving tools
@@ -570,17 +587,15 @@
 		touch # change file timestamps
 		### network info
 			ip
+			iw
 			ping
 			traceroute
-			tcpdump
 			arp
-			ifconfig
 			route
 			netstat
 			ss
 			dnsmap
-			avahi-browse
-			telnet
+			tcpdump
 			wol
 	## ArchLinux package manager utilities
 		man pacman
@@ -687,7 +702,7 @@
 		systemctl restart systemd-logind.service # ALL SESSIONS WILL BE CLOSED
 		reboot
 		systemctl <power_state> # hibernate, or suspend, or suspend-then-hibernate, or hybrid-sleep
-	## mount a hard drive with permissions
+	## mount the hard drive with permissions
 		id # get your uid and gid
 		<# permissions
 			7 : read, write and execute
@@ -709,14 +724,14 @@
 			chown mountshare:mountshare /home/mountshare/ -R
 			chmod ug+rwx,o-rwx /home/mountshare/ -R
 			# now mount disks to /home/mountshare/<mount_directory> with umask=007
-	## disk encryption
+	## folder encryption (ecryptfs)
 		pacman -S ecryptfs-utils keyutils
 		modprobe ecryptfs # and reboot
-		mkdir home/maldenol/encrypted # here is ciphered data
-		mkdir home/maldenol/mounted # here is unciphered mounted data
-		chown maldenol:maldenol /home/maldenol/{encrypted,mounted} # if created by root
-		mount -t ecryptfs /home/maldenol/encrypted /home/maldenol/mounted # enter useful data
-		mount -t ecryptfs /home/maldenol/encrypted /home/maldenol/mounted -o ecryptfs_cipher=<cipher>,ecryptfs_key_bytes=<ebytes>,key=<passphrase> # now you can access to your encrypted directory
+		mkdir /home/<user>/encrypted/ # here is ciphered data storage
+		mkdir /home/<user>/mounted/ # here is unciphered mounted data
+		chown <user>:<user> /home/<user>/{encrypted,mounted}/ # if created by root
+		mount -t ecryptfs /home/<user>/encrypted/ /home/<user>/mounted/ # setup the storage
+		mount -t ecryptfs /home/<user>/encrypted/ /home/<user>/mounted/ -o ecryptfs_cipher=<cipher>,ecryptfs_key_bytes=<ebytes>,key=<passphrase> # now you can access to your encrypted directory
 		cryptsetup # use it to setup encrypted devices
 	## silent boot
 		### GRUB 2
@@ -1049,15 +1064,18 @@
 			proxychains nmap --spoof-mac 0 <args> # run it with each command to hide your MAC and IP
 		### aircrack-ng tools
 			airmon-ng check kill
-			airmon-ng start <wifi_interface>
-			airodump-ng <wifi_interface>mon # sniffing 
-			iwconfig wlan0 channel 1
-			ifconfig <wifi_interface> down
-			ifconfig <wifi_interface> up
-			aireplay-ng <wifi_interface>mon --deauth 150 -a <BSSID> # deauth
-			reaver -i <wifi_interface>mon -c 1 -b <BSSID> -vv # WPS bruteforce
-			airodump-ng <wifi_interface>mon -c 1 --bssid <BSSID> -w sipheredKeys # wpa2 keys interception
+			ip link set <WiFi_interface> down
+			iw <WiFi_interface> set monitor control
+			ip link set <WiFi_interface> up
+			airodump-ng <WiFi_interface> # sniffing
+			aireplay-ng <WiFi_interface> --deauth 150 -a <BSSID> # deauth
+			airodump-ng <WiFi_interface> -c 1 --bssid <BSSID> -w sipheredKeys # wpa2 keys interception
 			aircrack-ng -w wordlist.txt -l password.txt sipheredKeys-01.cap # wpa2 key bruteforce
+			reaver -i <WiFi_interface> -c 1 -b <BSSID> -vv # WPS bruteforce
+			ip link set <WiFi_interface> down
+			iw <WiFi_interface> set type managed
+			ip link set <WiFi_interface> up
+			systemctl start NetworkManager wpa_supplicant
 		### Metasploit Project
 			msfconsole
 			db_connect msf@msf
@@ -1121,14 +1139,14 @@
 		make modules_install && make install # install kernel modules and the kernel itself
 		# mkinitcpio and grub-mkconfig
 	## creating well secured system
-		# make strong passwords for BIOS/UEFI and bootloader
+		# make strong passwords for the BIOS/UEFI and the bootloader
 		# disable useless devices with BIOS/UEFI
 		# install clean Arch
-		# compile your own and harden the kernel and the glibc's malloc()
+		# compile your own kernel, then harden it and the glibc's malloc()
 		# update packages and the CPU microcode
-		# encrypt your disks, change rights
+		# encrypt your disks, configure rights
 		# make strong passwords for all users and disable root login
-		# install security tools
+		# install and setup security tools
 		## make your own firewall image using archiso
 			# repeat all previous steps
 			# setup iptables to filter and forward traffic to your system with policy DROP
