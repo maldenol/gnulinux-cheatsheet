@@ -517,15 +517,18 @@
 		ln
 		chown, chmod
 		cat, grep, less
-		echo, printf
-		diff
-		find, sed, sort
+		head, tail
+		diff, wc
+		locate, find, sed, sort
 		du, tree
+		touch
+		echo, printf
 		pwd
-		date, calc
-		jobs, fg, bg
-		write, mesg, talk
+		date, cal
+		jobs, fg, bg, kill
+		write, mesg, talk, lpr
 		exec
+		factor, expr
 		# all filesystem objects are files
 		# you can use ctrl+c, ctrl+d, ctrl+z and other hotkeys
 		# you can redirect I/O streams with >, >>, <
@@ -554,11 +557,11 @@
 			bunzip2
 			tar
 	## informational and management tools
+		help # help
 		man <command> # an interface to the system reference manuals
 		info <command> # Stand-alone GNU Info
 		top # system status and process info
 		htop # system status ans process management
-		gtop # system status
 		pstree # tree of processes
 		ps # currently running processes
 		fuser # network using by processes
@@ -566,8 +569,8 @@
 		df # disk usage
 		hdparm # hard drive parameters 
 		uname # system information
-		uptime # uptime
-		vmstat # system info
+		uptime # system uptime
+		vmstat # virtual memory statistics
 		iotop # I/O info 
 		lsblk # list of hard disks
 		blkid # partitions' ids
@@ -580,11 +583,10 @@
 		who # shows who is logged in and from where
 		last # shows login chronology
 		lastlog # shows users' login time
-		tail # log analyzer
 		dmesg # print or control the kernel ring buffer
 		which <command> # shows command executable file path
 		cat /etc/services # shows used by services ports
-		touch # change file timestamps
+		touch <file> # change file timestamps to current moment
 		### network info
 			ip
 			iw
@@ -594,6 +596,7 @@
 			route
 			netstat
 			ss
+			dig, nslookup
 			dnsmap
 			tcpdump
 			wol
