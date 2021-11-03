@@ -237,13 +237,12 @@
 			pacman -S emacs vim
 			pacman -S code # or install from AUR (visual-studio-code-bin)
 			pacman -S kdevelop qt5 qtcreator
-			sasm # install from AUR
 			pacman -S arduino arduino-docs arduino-avr-core
 			pacman -S processing
 		### utilities
-			pacman -S valgrind cscope perf strace pahole
+			pacman -S binutils valgrind cscope perf strace pahole
 			pacman -S git
-			pacman -S distcc ccache
+			pacman -S ccache distcc
 			oclint # install from AUR
 		### databases
 			#### SQLite
