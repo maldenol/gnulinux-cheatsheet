@@ -34,6 +34,7 @@
 	## swap (optional)
 		### as file
 			dd if=/dev/zero of=/mnt/swapfile bs=1MiB count=<RAM_size_in_MiB> status=progress && sync
+			# use "dd if=/dev/zero of=/mnt/swapfile bs=1MiB count=<additional_size_in_MiB> oflag=append conv=notrunc status=progress && sync"
 			chmod 600 /mnt/swapfile
 			mkswap /mnt/swapfile
 			swapon /mnt/swapfile
@@ -41,7 +42,7 @@
 			mkswap /dev/sdXZ # where sdXZ is partition for linux swap
 			swapon /dev/sdXZ
 	## installing packages
-		nano /etc/pacman.conf # decomment '[multilib]' and 'Include = /etc/pacman.d/mirrorlist'
+		nano /etc/pacman.conf # decomment "[multilib]" and "Include = /etc/pacman.d/mirrorlist"
 		nano /etc/pacman.d/mirrorlist # move the server nearest you to the top
 		pacman -Syy
 		pacstrap /mnt linux linux-firmware linux-headers base base-devel multilib-devel arch-install-scripts net-tools dhcpcd networkmanager dialog iw wpa_supplicant
@@ -51,7 +52,7 @@
 	## chroot
 		arch-chroot /mnt
 	## pacman setup
-		nano /etc/pacman.conf # decomment '[multilib]' and 'Include = /etc/pacman.d/mirrorlist'
+		nano /etc/pacman.conf # decomment "[multilib]" and "Include = /etc/pacman.d/mirrorlist"
 		pacman -Syy pacman-mirrorlist pacman-contrib
 		nano /etc/pacman.d/mirrorlist.pacnew # move the server nearest you to the top
 		rankmirrors -n <number_of_uncommented_servers> /etc/pacman.d/mirrorlist.pacnew > /etc/pacman.d/mirrorlist
@@ -108,7 +109,7 @@
 			#>
 		### GRUB password
 			grub-mkpasswd-pbkdf2 # get hash of password
-			nano /etc/grub/grub.cfg <# add next
+			nano /etc/grub/grub.cfg <# add the following
 				set superusers="<username>"
 				password_pbkdf2 <username> <pbkdf2_of_password>
 			#>
@@ -134,7 +135,8 @@
 		pacman -S powerdevil plasma-nm plasma-browser-integration kwalletmanager kaccounts-providers packagekit-qt5 discover kmix spectacle kdeconnect
 		pacman -S sddm sddm-kcm
 		systemctl enable --now sddm
-		# you can also use Xfce, Openbox or anything else instead of KDE Plasma
+		# you can also use another desktop environment like Xfce, Gnome or window manager like Openbox instead of KDE Plasma
+		# you can also use another display manager like LightDM, GDM or do without it
 	## security
 		pacman -S iptables
 		systemctl enable --now iptables
@@ -143,10 +145,10 @@
 			grub-mkconfig -o /boot/grub/grub.cfg
 	## graphics and sound
 		### Nvidia
-			pacman -S nvidia nvidia-utils lib32-nvidia-utils nvidia-settings opencl-nvidia lib32-opencl-nvidia opencl-headers # or 'nvidia-390xx-dkms' (or 'nvidia-340xx-dkms') instead 'nvidia' for unsupported graphics cards
+			pacman -S nvidia nvidia-utils lib32-nvidia-utils nvidia-settings opencl-nvidia lib32-opencl-nvidia opencl-headers # or "nvidia-390xx-dkms" (or "nvidia-340xx-dkms') instead of "nvidia" for unsupported graphics cards
 			#### Optimus Manager
 				optimus-manager # install from AUR
-				nano /etc/sddm.conf # comment 'DisplayCommand' and 'DisplayStopCommand'
+				nano /etc/sddm.conf # comment "DisplayCommand" and "DisplayStopCommand"
 				systemctl enable optimus-manager.service # and reboot
 				optimus-manager --switch <intel|nvidia|hybrid|auto> # switch graphics card
 				optimus-manager --set-startup <intel|nvidia|hybrid|auto> # switch graphics card on startup
@@ -172,7 +174,7 @@
 	## input devices
 		### keyboard
 			pacman -S kbd terminus-font
-			nano /etc/vconsole.conf <# add next
+			nano /etc/vconsole.conf <# add the following
 				LOCALE="uk_UA.UTF-8" # you can also set "uk_UA.utf-8" and "uk_UA.utf8"
 				LANG="uk_UA.UTF-8"
 				KEYMAP="us"
@@ -183,7 +185,7 @@
 				HARDWARECLOCK="UTC"
 				TIMEZONE="Europe/Kiev"
 			#>
-			nano /etc/locale.conf <# add next
+			nano /etc/locale.conf <# add the following
 				LANG="uk_UA.UTF-8" # LANG sets all LC_* variables (LC_ALL sets LANG and LC_*, but you can't set it here)
 				LC_MESSAGES="en_US.UTF-8"
 			#>
@@ -191,21 +193,34 @@
 		### mouse
 			pacman -S gpm libinput
 			gpm -m <mouse_device> -t <type> # for one-time execution
-			nano /etc/conf.d/gpm <# add next
+			nano /etc/conf.d/gpm <# add the following
 				GPM_ARGS="-m <mouse_device> -t <type>"
 			#>
 			systemctl enable --now gpm.service
+		### touchpad
+			pacman -S xf86-input-synaptics
+			nano /etc/X11/xorg.conf.d/50-synaptics.conf <# add the following
+				Section "InputClass"
+				Identifier "touchpad catchall"
+				Driver "synaptics"
+				MatchIsTouchpad "on"
+				MatchDevicePath "/dev/input/event*"
+					Option "TapButton1" "1"
+					Option "TapButton2" "2"
+					Option "TapButton3" "3"
+				EndSection
+			#>
 	## laptop
 		### HDD shock protection
 			#### Hewlett-Packard/Compaq
 				hpfall-git # install from AUR
-				nano /etc/conf.d/hpfall <# add next
+				nano /etc/conf.d/hpfall <# add the following
 					DEVICE=<HDD_device>
 				#>
 				systemctl enable --now hpfall
 			#### Lenovo/IBM ThinkPad
 				pacman -S tp_smapi hdapsd
-				nano /etc/modprobe.d/modprobe.conf # configure 'invert' option
+				nano /etc/modprobe.d/modprobe.conf # configure "invert" option
 				nano /etc/systemd/system/hdapsd.service.d/sensitivity.conf # configure sensivity
 	## digital signature utilities
 		### GnuPG (PGP)
@@ -217,7 +232,7 @@
 			Enpass # install from AUR (enpass-bin) # or Bitwarden (bitwarden-bin)
 	## software development kit
 		### languages
-			pacman -S gcc gdb
+			pacman -S gcc gdb clang
 			pacman -S nasm binutils
 			pacman -S python python-pip
 			pacman -S rust
@@ -323,7 +338,7 @@
 		### bluetooth
 			pacman -S pulseaudio-alsa bluez bluez-libs bluez-utils bluedevil pulseaudio-bluetooth # run bluetooth daemons
 			bluez-firmware # install from AUR
-			nano /etc/pulse/default.pa # add " tsched=0" after "load-module module-udev-detect"
+			nano /etc/pulse/default.pa # add "tsched=0" after "load-module module-udev-detect"
 		### iOS
 			pacman -S libimobiledevice usbmuxd # run usbmuxd.service
 			ifuse # install from AUR
@@ -448,10 +463,10 @@
 			pacman -S tor # run tor daemon
 			#### proxychains
 				pacman -S proxychains-ng
-				nano /etc/proxychains.conf # decomment 'dynamic_chain' and comment 'strict_chain', change 'socks4' to 'socks5'
+				nano /etc/proxychains.conf # decomment "dynamic_chain" and comment "strict_chain", change "socks4" to "socks5"
 				proxychains <program> # usage
 			#### torify system
-				nano /etc/tor/torrc <# add next
+				nano /etc/tor/torrc <# add the following
 					TransPort 9040
 					DNSPort 9053
 					AutomapHostsOnResolve 1
@@ -528,6 +543,7 @@
 		write, mesg, talk, lpr
 		exec
 		factor, expr
+		dd, truncate
 		# all filesystem objects are files
 		# you can use ctrl+c, ctrl+d, ctrl+z and other hotkeys
 		# you can redirect I/O streams with >, >>, <
@@ -586,6 +602,7 @@
 		which <command> # shows command executable file path
 		cat /etc/services # shows used by services ports
 		touch <file> # change file timestamps to current moment
+		time <program> # time of program running
 		### network info
 			ip
 			iw
@@ -626,7 +643,7 @@
 		systemctl # control the systemd system and service manager
 		journalctl # query the systemd journal
 		### add a new systemd service
-			nano /etc/systemd/system/<service_name>.service <# add next
+			nano /etc/systemd/system/<service_name>.service <# add the following
 				[Unit]
 				Description=<description>
 				After=<previous_target>
@@ -692,13 +709,17 @@
 		nano /etc/crontab # enter "<minute> <hour> <day_of_month> <month> <day_of_week> <command_or_script>" (* to all, */n to every n, a,b to several)
 	## enable numlock at logon
 		pacman -S numlockx
-		nano ~/.bash_profile # add 'numlockx &'
-	## suspend and hibernate
+		nano ~/.bash_profile # add "numlockx &"
+	## suspending the system
 		# does not work on linux-hardened
-		nano /sys/power/image_size # set size of hibernation image (bigger is faster)
-		nano /etc/default/grub # add "resume=/dev/<swap_partition>" (separated by spaces with previous parameters) in GRUB_CMDLINE_LINUX_DEFAULT
+		nano /sys/power/image_size # set size of hibernation image (less if slower)
+		### swap partition
+			nano /etc/default/grub # add "resume=<swap_partition>" in GRUB_CMDLINE_LINUX_DEFAULT
+		### swap file
+			filefrag -v /swapfile | awk '$1=="0:" {print substr($4, 1, length($4)-2)}' # get swap file offset
+			nano /etc/default/grub # add "resume=<swapfile_volume> resume_file_offset=<swapfile_offset>" in GRUB_CMDLINE_LINUX_DEFAULT
 		grub-mkconfig -o /boot/grub/grub.cfg
-		nano /etc/mkinitcpio.conf # in "HOOKS" add 'resume' after 'filesystems' if there is 'base' but not 'systemd', if you use UUID add 'resume' after 'udev'
+		nano /etc/mkinitcpio.conf # in HOOKS add "resume" after "filesystems" if there is "base" but not "systemd", if you use UUID add "resume" after "udev"
 		mkinitcpio -p linux
 		nano /etc/systemd/logind.conf # configure to your needs
 		systemctl restart systemd-logind.service # ALL SESSIONS WILL BE CLOSED
@@ -739,7 +760,7 @@
 		### GRUB 2
 			grub-silent # install from AUR
 			# reinstall GRUB
-			nano /etc/default/grub <# add next
+			nano /etc/default/grub <# add the following
 				GRUB_TIMEOUT=0
 				GRUB_HIDDEN_TIMEOUT=3
 				GRUB_RECORDFAIL_TIMEOUT=$GRUB_HIDDEN_TIMEOUT
@@ -748,14 +769,14 @@
 			setterm -cursor on >> /etc/issue
 		### Plymouth
 			plymouth # install from AUR
-			nano /etc/default/grub # set 'GRUB_CMDLINE_LINUX_DEFAULT' to "quiet splash loglevel=3 rd.udev.log_priority=3 vt.global_cursor_default=0"
+			nano /etc/default/grub # set GRUB_CMDLINE_LINUX_DEFAULT to "quiet splash loglevel=3 rd.udev.log_priority=3 vt.global_cursor_default=0"
 			setterm -cursor on >> /etc/issue
 			# regenerate grub.cfg
-			nano /etc/mkinitcpio.conf # add 'plymouth' in 'HOOKS' between 'base' and 'udev'
+			nano /etc/mkinitcpio.conf # add "plymouth" in HOOKS between "base" and "udev"
 			# configure /etc/plymouth/plymouthd.conf
 			cp <background_image> /usr/share/plymouth/themes/<theme>/background-tile.png
 			cp /usr/share/plymouth/arch-logo.png /usr/share/plymouth/themes/spinner/watermark.png
-			nano /usr/share/plymouth/themes/<theme>/<theme>.plymouth <# add next
+			nano /usr/share/plymouth/themes/<theme>/<theme>.plymouth <# add the following
 				WatermarkHorizontalAlignment=.5
 				WatermarkVerticalAlignment=.5
 			#>
@@ -804,7 +825,7 @@
 				5. JFS - high performance, consumes few processor resources;
 				6. Btrfs - the highest performance, conditionally stable, functionable, under development.
 		### ram cache optimization
-			nano /etc/sysctl.d/99-sysctl.conf # set 'vm.vfs_cache_pressure=500' (from 0 to 1000 inversely to RAM volume)
+			nano /etc/sysctl.d/99-sysctl.conf # set "vm.vfs_cache_pressure=500" (from 0 to 1000 inversely to RAM volume)
 	## additional devices
 		### use PS controller as XBox
 			xboxdrv
@@ -971,9 +992,9 @@
 			systemctl enable --now snort@<interface> # IDS mode
 		### DHCP
 			nano /etc/dhcpd.conf <# type next
-				option domain-name-servers <dns_ips_comma_separated>; # default Google (8.8.8.8 and 8.8.4.4) or your DNS server
+				option domain-name-servers <dns_ips_comma_separated>; # Google default DNS (8.8.8.8 and 8.8.4.4) or yours
 				option subnet-mask <network_mask>;
-				option routers <routers_ips_comma_separated>; # default your device's IP
+				option routers <routers_ips_comma_separated>; # your device's default IP
 				subnet <network_ip> netmask <network_mask> {
 					range <dhcp_ip_range_beginning> <dhcp_ip_range_end>;
 				}
@@ -1159,11 +1180,6 @@
 
 
 4. Troubleshooting
-	## mkinitcpio: possibly missing firmware for modules aic94xx, wd719x and xhci_pci
-		aic94xx-firmware wd719x-firmware upd72020x-fw # install from AUR
-		mkinitcpio -p linux
-	## Failed to start Load/Save Brightness of backlight:acpi_video0 and Failed to start Load/Save Screen Backlight Brightness of backlight:amdgpu_b10
-		nano /etc/default/grub # add 'acpi_backlight=video video.use_native_backlight=1' to 'GRUB_CMDLINE_LINUX_DEFAULT'
 	## pacman or ldconfig error
 		pacman --force -S $(pacman -Qqen) # in newer version --overwrite instead of --force
 	## pacman gpg error
@@ -1177,7 +1193,7 @@
 			pacman-key --refresh-keys
 			pacman -Syy
 		### another bad way
-			nano /etc/pacman.conf # add in "[options]" section "SigLevel = TrustAll"
+			nano /etc/pacman.conf # add under [options] section "SigLevel = TrustAll"
 	## pacman warning: directory permissions differ
 		pacman-fix-permissions # install from AUR
 		pacman-fix-permissions -a
@@ -1198,15 +1214,13 @@
 	## Xorg configuration reset
 		Xorg :0 -configure
 		cp /root/xorg.conf.new /etc/X11/xorg.conf
-	## reinstall pip
-		sudo rm -rf /usr/lib/python3.7/<problem_directory>
-		sudo python3.7 -m ensurepip
-		sudo pip install --upgrade pip
+	## Failed to start Load/Save Brightness of backlight:acpi_video0 and Failed to start Load/Save Screen Backlight Brightness of backlight:amdgpu_b10
+		nano /etc/default/grub # add "acpi_backlight=video video.use_native_backlight=0" to GRUB_CMDLINE_LINUX_DEFAULT
+	## no sound after hibernation with ALSA
+		systemctl suspend
 	## tearing
 		# use Wayland instead of X Windows System
 		# edit output setting in Plasma
-	## no sound after hibernation with ALSA
-		systemctl suspend
 	## resolution fix after display connect
 		xrandr # grep your primary screen and connected displays
 		nano ~/.bash_profile <# add this
@@ -1214,8 +1228,19 @@
 			xrandr --output HDMI-1-1 --mode 1360x768
 			# xrandr --output <interface> --mode <resolution>
 		#>
+	## mkinitcpio: possibly missing firmware for modules aic94xx, wd719x and xhci_pci
+		aic94xx-firmware wd719x-firmware upd72020x-fw # install from AUR
+		mkinitcpio -p linux
+	## reinstall pip
+		sudo rm -rf /usr/lib/python3.7/<problem_directory>
+		sudo python3.7 -m ensurepip
+		sudo pip install --upgrade pip
+	## unresolved bugs
+		# wrong password timeout problem
+		# tty control keys problem
+		# mute LED problem
 #
 
 
 # Malovanyi Denys Olehovych (21.11.2003, Vinnytsia, Ukraine)
-# Sin
+# Since March 2019.
