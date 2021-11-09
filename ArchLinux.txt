@@ -3,10 +3,10 @@
 
 
 # 1. Installation
-	# ArchWiki at https://wiki.archlinux.org/
+	# see ArchWiki at https://wiki.archlinux.org/
 	## integrity check
 		# download ISO-file and GPG-signature (check it with PGP fingerprint) from https://www.archlinux.org/download/
-		pacman-key -v archlinux-<version>-x86_64.iso.sig # to verify iso image using signature before install
+		pacman-key -v archlinux-<version>-x86_64.iso.sig # to verify the ISO image using the signature before installation
 	# boot
 	## Internet connection
 		wifi-menu # for wireless connection
@@ -31,7 +31,7 @@
 			mkfs.ext4 /dev/sdX3
 	## mounting root filesystem
 		mount /dev/sdXY /mnt
-	## swap (optional)
+	## setting up swap (optional)
 		### as file
 			dd if=/dev/zero of=/mnt/swapfile bs=1MiB count=<RAM_size_in_MiB> status=progress && sync
 			# use "dd if=/dev/zero of=/mnt/swapfile bs=1MiB count=<additional_size_in_MiB> oflag=append conv=notrunc status=progress && sync"
@@ -49,9 +49,9 @@
 		# install optional dependencies for installed packages
 	## generating filesystem table file
 		genfstab -U /mnt >> /mnt/etc/fstab
-	## chroot
+	## chrooting
 		arch-chroot /mnt
-	## pacman setup
+	## setting up pacman
 		nano /etc/pacman.conf # decomment "[multilib]" and "Include = /etc/pacman.d/mirrorlist"
 		pacman -Syy pacman-mirrorlist pacman-contrib
 		nano /etc/pacman.d/mirrorlist.pacnew # move the server nearest you to the top
@@ -65,7 +65,7 @@
 		hwclock --systohc
 	## host settings
 		nano /etc/hostname # write your host name
-		nano /etc/hosts <# write
+		nano /etc/hosts <# write the following
 			127.0.0.1 localhost
 			::1 localhost
 			127.0.1.1 <hostname>.localdomain <hostname> # or static ip adress
@@ -109,7 +109,7 @@
 			#>
 		### GRUB password
 			grub-mkpasswd-pbkdf2 # get hash of password
-			nano /etc/grub/grub.cfg <# add the following
+			nano /etc/grub/grub.cfg <# write the following
 				set superusers="<username>"
 				password_pbkdf2 <username> <pbkdf2_of_password>
 			#>
@@ -122,7 +122,7 @@
 
 
 # 2. Setting up
-	## adding user
+	## adding a user
 		useradd -m <user>
 		passwd <user>
 		nano /etc/sudoers # add "<user> ALL=(ALL) ALL" to give user privileged rights
@@ -174,7 +174,7 @@
 	## input devices
 		### keyboard
 			pacman -S kbd terminus-font
-			nano /etc/vconsole.conf <# add the following
+			nano /etc/vconsole.conf <# write the following
 				LOCALE="uk_UA.UTF-8" # you can also set "uk_UA.utf-8" and "uk_UA.utf8"
 				LANG="uk_UA.UTF-8"
 				KEYMAP="us"
@@ -185,7 +185,7 @@
 				HARDWARECLOCK="UTC"
 				TIMEZONE="Europe/Kiev"
 			#>
-			nano /etc/locale.conf <# add the following
+			nano /etc/locale.conf <# write the following
 				LANG="uk_UA.UTF-8" # LANG sets all LC_* variables (LC_ALL sets LANG and LC_*, but you can't set it here)
 				LC_MESSAGES="en_US.UTF-8"
 			#>
@@ -193,13 +193,13 @@
 		### mouse
 			pacman -S gpm libinput
 			gpm -m <mouse_device> -t <type> # for one-time execution
-			nano /etc/conf.d/gpm <# add the following
+			nano /etc/conf.d/gpm <# write the following
 				GPM_ARGS="-m <mouse_device> -t <type>"
 			#>
 			systemctl enable --now gpm.service
 		### touchpad
 			pacman -S xf86-input-synaptics
-			nano /etc/X11/xorg.conf.d/50-synaptics.conf <# add the following
+			nano /etc/X11/xorg.conf.d/50-synaptics.conf <# write the following
 				Section "InputClass"
 				Identifier "touchpad catchall"
 				Driver "synaptics"
@@ -214,7 +214,7 @@
 		### HDD shock protection
 			#### Hewlett-Packard/Compaq
 				hpfall-git # install from AUR
-				nano /etc/conf.d/hpfall <# add the following
+				nano /etc/conf.d/hpfall <# write the following
 					DEVICE=<HDD_device>
 				#>
 				systemctl enable --now hpfall
@@ -466,7 +466,7 @@
 				nano /etc/proxychains.conf # decomment "dynamic_chain" and comment "strict_chain", change "socks4" to "socks5"
 				proxychains <program> # usage
 			#### torify system
-				nano /etc/tor/torrc <# add the following
+				nano /etc/tor/torrc <# write the following
 					TransPort 9040
 					DNSPort 9053
 					AutomapHostsOnResolve 1
@@ -643,7 +643,7 @@
 		systemctl # control the systemd system and service manager
 		journalctl # query the systemd journal
 		### add a new systemd service
-			nano /etc/systemd/system/<service_name>.service <# add the following
+			nano /etc/systemd/system/<service_name>.service <# write the following
 				[Unit]
 				Description=<description>
 				After=<previous_target>
@@ -717,7 +717,7 @@
 			nano /etc/default/grub # add "resume=<swap_partition>" in GRUB_CMDLINE_LINUX_DEFAULT
 		### swap file
 			filefrag -v /swapfile | awk '$1=="0:" {print substr($4, 1, length($4)-2)}' # get swap file offset
-			nano /etc/default/grub # add "resume=<swapfile_volume> resume_file_offset=<swapfile_offset>" in GRUB_CMDLINE_LINUX_DEFAULT
+			nano /etc/default/grub # add "resume=<swapfile_volume> resume_offset=<swapfile_offset>" in GRUB_CMDLINE_LINUX_DEFAULT
 		grub-mkconfig -o /boot/grub/grub.cfg
 		nano /etc/mkinitcpio.conf # in HOOKS add "resume" after "filesystems" if there is "base" but not "systemd", if you use UUID add "resume" after "udev"
 		mkinitcpio -p linux
@@ -760,7 +760,7 @@
 		### GRUB 2
 			grub-silent # install from AUR
 			# reinstall GRUB
-			nano /etc/default/grub <# add the following
+			nano /etc/default/grub <# write the following
 				GRUB_TIMEOUT=0
 				GRUB_HIDDEN_TIMEOUT=3
 				GRUB_RECORDFAIL_TIMEOUT=$GRUB_HIDDEN_TIMEOUT
@@ -776,7 +776,7 @@
 			# configure /etc/plymouth/plymouthd.conf
 			cp <background_image> /usr/share/plymouth/themes/<theme>/background-tile.png
 			cp /usr/share/plymouth/arch-logo.png /usr/share/plymouth/themes/spinner/watermark.png
-			nano /usr/share/plymouth/themes/<theme>/<theme>.plymouth <# add the following
+			nano /usr/share/plymouth/themes/<theme>/<theme>.plymouth <# write the following
 				WatermarkHorizontalAlignment=.5
 				WatermarkVerticalAlignment=.5
 			#>

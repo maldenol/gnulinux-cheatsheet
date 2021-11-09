@@ -9,7 +9,7 @@
 		wget -O- https://gentoo.org/.well-known/openpgpkey/hu/wtktzo4gyuhzu8a4z5fdj3fgmr1u6tob?l=releng | gpg --import
 		gpg --verify install-amd64-minimal-20141204.iso.DIGESTS.asc
 	# boot
-	# use "links https://wiki.gentoo.org/wiki/Handbook" for manual
+	# use "links https://wiki.gentoo.org/wiki/Handbook" for the manual
 	## set up locale settings
 		loadkeys us
 		date <MMDDhhmmYYYY>
@@ -50,14 +50,14 @@
 		cd /mnt/gentoo/
 		### Stage 3 archive
 			links https://www.gentoo.org/downloads/#other-arches # download Stage 3 archive and other needed files
-			openssl dgst -r -sha512 stage3-amd64-<release>.tar.xz # calculate and verify SHA512 sum
-			sha512sum stage3-amd64-<release>.tar.xz # calculate and verify SHA512 sum
-			openssl dgst -r -whirlpool stage3-amd64-<release>.tar.xz # calculate and verify Whirlpool
-			gpg --verify stage3-amd64-<release>.tar.xz{.DIGESTS.asc,} # verify GPG signature
-			tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner # unpack tarball
+			openssl dgst -r -sha512 stage3-amd64-<release>.tar.xz # calculate and verify the SHA512 sum
+			sha512sum stage3-amd64-<release>.tar.xz # calculate and verify the SHA512 sum
+			openssl dgst -r -whirlpool stage3-amd64-<release>.tar.xz # calculate and verify the Whirlpool
+			gpg --verify stage3-amd64-<release>.tar.xz{.DIGESTS.asc,} # verify the GPG signature
+			tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner # unpack the tarball
 			rm stage3-*
 		### Portage configuring
-			nano -w /mnt/gentoo/etc/portage/make.conf <# add next
+			nano -w /mnt/gentoo/etc/portage/make.conf <# write the following
 				COMMON_FLAGS="-march=native -O2 -pipe"
 				MAKEOPTS="-j<jobs_number>" # where <jobs_number> is the smaller of the two numbers: integer RAM divided by 2GiB and logical processors count plus one
 				USE="<USE_flags>" # see package.use manual
@@ -65,7 +65,7 @@
 			mirrorselect -i -o >> /mnt/gentoo/etc/portage/make.conf
 			mkdir -p /mnt/gentoo/etc/portage/repos.conf/
 			cp /mnt/gentoo/usr/share/portage/config/repos.conf /mnt/gentoo/etc/portage/repos.conf/gentoo.conf
-		### DNS settings copy
+		### DNS settings copying
 			cp --dereference /etc/resolv.conf /mnt/gentoo/etc/
 		### chrooting
 			mount --types proc /proc/ /mnt/gentoo/proc/
@@ -80,18 +80,18 @@
 			source /etc/profile
 			export PS1="(chroot) ${PS1}"
 		### installation using Portage
-			emerge-webrsync # installs recent ebuild repository snapshot (recent up to 24 hours), recommended for strict firewall
-			emerge --sync # installs recent ebuild repository snapshot (recent up to 1 hour)
-			eselect news list # shows list of news about installed packages
-			eselect news read <message_number> # shows news about installed packages
-			eselect profile list # shows available Portage profiles
-			eselect profile set <profile_number> # sets Portage profile
-			emerge --ask --verbose --update --deep --newuse @world # updates world (system + selected) set for current profile
+			emerge-webrsync # install recent ebuild repository snapshot (recent up to 24 hours), recommended for strict firewall
+			emerge --sync # install recent ebuild repository snapshot (recent up to 1 hour)
+			eselect news list # show list of news about installed packages
+			eselect news read <message_number> # show news about installed packages
+			eselect profile list # show available Portage profiles
+			eselect profile set <profile_number> # set Portage profile
+			emerge --ask --verbose --update --deep --newuse @world # update world (system + selected) set for current profile
 		### kernel compiling
 			emerge --ask sys-kernel/genkernel
 			emerge --ask sys-kernel/linux-firmware
 			#### manually
-				emerge --ask sys-kernel/gentoo-sources # installs sources of Gentoo version of Linux kernel
+				emerge --ask sys-kernel/gentoo-sources # install sources of Gentoo version of Linux kernel
 				emerge --ask sys-apps/pciutils sys-apps/usbutils
 				lspci # see PCI devices for kernel configuration
 				lsusb # see USB devices for kernel configuration
@@ -100,11 +100,11 @@
 				make menuconfig # configure Linux kernel for your needs
 				make -j<jobs_number> # compile Linux kernel
 				make modules_install && make install # install kernel modules and the kernel itself
-				genkernel --install --kernel-config=/usr/src/linux/.config initramfs # makes and installs initramfs
+				genkernel --install --kernel-config=/usr/src/linux/.config initramfs # make and install initramfs
 			#### automatically
 				genkernel all
-		### filesystem table
-			nano -w /etc/fstab <# add next
+		### making filesystem table
+			nano -w /etc/fstab <# write the following
 				<partition_id> <mount_point> <filesystem> <mount_options_separated_by_comma> <dump_boolean> <order_to_fsck>
 			#>
 		### installing tools
@@ -129,25 +129,25 @@
 		nano -w /etc/locale.gen # add "en_US.UTF-8 UTF-8" and "uk_UA.UTF-8 UTF-8"
 		locale-gen # generates selected locales
 		emerge --ask media-fonts/terminus-font
-		nano -w /etc/env.d/02locale <# add next
+		nano -w /etc/env.d/02locale <# write the following
 			LOCALE="uk_UA.UTF-8" # you can also set "uk_UA.utf-8" and "uk_UA.utf8"
 			LANG="uk_UA.UTF-8"
 		#>
 		nano -w /etc/conf.d/consolefont # set 'consolefont' to "ter-v16n" "ter-v16b"
-		nano -w /etc/conf.d/keymaps <# add next
+		nano -w /etc/conf.d/keymaps <# write the following
 			keymap="us"
 			keymap="ua-cp1251"
 		#>
-		nano -w /etc/conf.d/hwclock <# add next
+		nano -w /etc/conf.d/hwclock <# write the following
 			clock="UTC"
 		#>
 		rc-update add consolefont boot
-		env-update && source /etc/profile && export PS1="(chroot) ${PS1}" # updates chroot locale
+		env-update && source /etc/profile && export PS1="(chroot) ${PS1}" # update chroot locale
 	## host settings
-		nano -w /etc/conf.d/hostname <# add next
+		nano -w /etc/conf.d/hostname <# write the following
 			hostname="<host_name>"
 		#>
-		nano -w /etc/hosts <# add next
+		nano -w /etc/hosts <# write the following
 			127.0.0.1 <host_name>.<domain_name> <host_name> localhost
 			::1 <host_name>.<domain_name> <host_name> localhost
 		#>
@@ -160,7 +160,7 @@
 #
 
 # 2. Setting up
-	## adding user
+	## adding a user
 		useradd -m -G users,wheel,audio -s /bin/bash <user>
 		passwd <user>
 		emerge --ask app-admin/sudo
@@ -176,16 +176,16 @@
 		emerge --ask app-portage/layman
 		### distcc
 			emerge --ask sys-devel/distcc
-			nano /etc/portage/make.conf <# add next
+			nano /etc/portage/make.conf <# write the following
 				MAKEOPTS="-j<jobs_number_total> -l<jobs_number_local>"
 				FEATURES="distcc"
 			#>
 			#### ccache support
-				nano /etc/conf.d/distccd <# add next
+				nano /etc/conf.d/distccd <# write the following
 					PATH="/usr/lib/ccache/bin:${PATH}"
 					CCACHE_PREFIX="distcc"
 				#>
-				nano /etc/env.d/03distcc_ccache <# add next
+				nano /etc/env.d/03distcc_ccache <# write the following
 					CCACHE_DIR="/var/cache/ccache"
 					DISTCC_DIR="/var/tmp/portage/.distcc"
 				#>
@@ -197,11 +197,11 @@
 			rc-update add distccd default
 		### ccache
 			emerge --ask dev-util/ccache
-			nano /etc/portage/make.conf <# add next
+			nano /etc/portage/make.conf <# write the following
 				FEATURES="ccache"
 				CCACHE_SIZE="2G"
 			#>
-			nano /var/cache/ccache/ccache.conf <# add next
+			nano /var/cache/ccache/ccache.conf <# write the following
 				compression = true
 				compression_level = 1
 			#>
@@ -211,7 +211,7 @@
 			emerge --ask x11-drivers/nvidia-drivers
 			nano /etc/modules-load.d/nvidia.conf # add 'nvidia'
 			rc-update add modules boot
-			nano /etc/portage/make.conf <# add next
+			nano /etc/portage/make.conf <# write the following
 				VIDEO_CARDS="amdgpu radeonsi intel i915 i965 iris nvidia"
 			#>
 			emerge --ask media-libs/mesa
@@ -246,11 +246,11 @@
 			usermod -a -G video <user> # if you want to run Xorg-server manually
 		### SDDM
 			emerge --ask x11-misc/sddm
-			nano /etc/conf.d/display-manager <# add next
+			nano /etc/conf.d/display-manager <# write the following
 				CHECKVT=7
 				DISPLAYMANAGER="sddm"
 			#>
-			nano /etc/conf.d/xdm <# add next
+			nano /etc/conf.d/xdm <# write the following
 				CHECKVT=7
 				DISPLAYMANAGER="sddm"
 			#>
@@ -324,15 +324,15 @@
 			emerge --ask games-util/steam-meta
 		### Plymouth
 			emerge --ask sys-boot/plymouth sys-boot/plymouth-openrc-plugin
-			nano /etc/genkernel.conf <# add next
+			nano /etc/genkernel.conf <# write the following
 				SPLASH="no"
 				PLYMOUTH="yes"
 				PLYMOUTH_THEME="solar"
 			#>
-			nano /etc/rc.conf <# add next
+			nano /etc/rc.conf <# write the following
 				rc_interactive="NO"
 			#>
-			nano /etc/default/grub <# add next
+			nano /etc/default/grub <# write the following
 				GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
 			#>
 			# regenerate initramfs and bootloader configuration
@@ -354,7 +354,7 @@
 				nano /etc/proxychains.conf # decomment 'dynamic_chain' and comment 'strict_chain', change 'socks4' to 'socks5'
 				proxychains <program> # usage
 			#### torify system
-				nano /etc/tor/torrc <# add next
+				nano /etc/tor/torrc <# write the following
 					TransPort 9040
 					DNSPort 9053
 					AutomapHostsOnResolve 1
@@ -380,7 +380,7 @@
 				##### Xen
 					# KVM needed
 					emerge --ask app-emulation/xen app-emulation/xen-tools
-					nano /etc/xen/grub.conf <# add next
+					nano /etc/xen/grub.conf <# write the following
 						GRUB_CMDLINE_XEN="console_timestamps=boot"
 						GRUB_CMDLINE_XEN_DEFAULT="dom0_mem=1024M,max:1024M"
 						GRUB_CMDLINE_LINUX_XEN_REPLACE_DEFAULT="softlevel=xen"

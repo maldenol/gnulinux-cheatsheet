@@ -18,7 +18,7 @@
 		### wired connection
 			dhclient -v <interface>
 		### wireless connection
-			nano wpa_supplicant.conf <# add next
+			nano wpa_supplicant.conf <# write the following
 				network={
 					ssid="<SSID>"
 					key_mgmt=WPA-PSK
@@ -49,7 +49,7 @@
 		guix system init /mnt/etc/config.scm /mnt/
 	## host settings
 		nano /mnt/etc/hostname # write your host name
-		nano /mnt/etc/hosts <# write
+		nano /mnt/etc/hosts <# write the following
 			127.0.0.1 localhost
 			::1 localhost
 			127.0.1.1 <hostname>.localdomain <hostname> # or static ip adress
@@ -80,7 +80,7 @@
 		man herd
 		info shepherd
 		info herd
-	## building the installation image
+	## building an installation image
 		guix system disk-image --file-system-type=iso9660 gnu/system/install.scm
 #
 
