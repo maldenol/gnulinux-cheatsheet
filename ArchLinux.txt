@@ -245,7 +245,7 @@
 			pacman -S ruby
 			pacman -S android-tools android-udev
 		### build systems
-			pacman -S make cmake scons gradle
+			pacman -S ninja make cmake scons gradle
 		### text editors
 			pacman -S notepadqq # Qt clone of Notepad++
 		### IDEs
@@ -544,7 +544,7 @@
 		exec
 		factor, expr
 		dd, truncate
-		# all filesystem objects are files
+		# all filesystem objects (folders, devices, etc.) are files
 		# you can use ctrl+c, ctrl+d, ctrl+z and other hotkeys
 		# you can redirect I/O streams with >, >>, <
 		# you can use autocompletion with TAB
@@ -571,6 +571,7 @@
 			bzip2
 			bunzip2
 			tar
+			ar
 	## informational and management tools
 		help # help
 		man <command> # an interface to the system reference manuals
@@ -616,6 +617,12 @@
 			dnsmap
 			tcpdump
 			wol
+		### software development info
+			objdump -D <executable_file> # full disassembling
+			objdump -p <executable_file> # list dynamic libraries dependencies
+			ldd <executable_file> # list dynamic libraries dependencies
+			readelf -a <executable_file> # show ELF-file information
+			nm <executable_file> # list symbols
 	## ArchLinux package manager utilities
 		man pacman
 		pacman -Syu # upgrade packages
@@ -1164,18 +1171,21 @@
 	## creating well secured system
 		# make strong passwords for the BIOS/UEFI and the bootloader
 		# disable useless devices with BIOS/UEFI
-		# install clean Arch
-		# compile your own kernel, then harden it and the glibc's malloc()
-		# update packages and the CPU microcode
-		# encrypt your disks, configure rights
-		# make strong passwords for all users and disable root login
-		# install and setup security tools
-		## make your own firewall image using archiso
-			# repeat all previous steps
-			# setup iptables to filter and forward traffic to your system with policy DROP
-			# make your MAC address change every boot
-			# make your system boot this image to access Internet, forward network interfaces to this image and block their direct connections to your system
-		# sandbox unknown applications
+		### hard way
+			# install clean Arch
+			# compile your own kernel, then harden it and the glibc's malloc()
+			# update packages and the CPU microcode
+			# encrypt your disks, configure rights
+			# make strong passwords for all users and disable root login
+			# install and setup security tools
+			#### make your own firewall image using archiso
+				# repeat all previous steps
+				# setup iptables to filter and forward traffic to your system with policy DROP
+				# make your MAC address change every boot
+				# make your system boot this image to access Internet, forward network interfaces to this image and block their direct connections to your system
+			# sandbox unknown applications
+		### easy way
+			# install Qubes OS (security), Whonix (security and anonymity) or Tails (anonymity)
 #
 
 
@@ -1220,7 +1230,7 @@
 		systemctl suspend
 	## tearing
 		# use Wayland instead of X Windows System
-		# edit output setting in Plasma
+		# edit output settings in Plasma
 	## resolution fix after display connect
 		xrandr # grep your primary screen and connected displays
 		nano ~/.bash_profile <# add this
