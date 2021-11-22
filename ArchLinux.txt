@@ -292,7 +292,7 @@
 				pacman -S kubectl
 				rancher/cattle # download from GitHub
 	## other
-		pacman -S htop tiptop perf iotop strace lsof
+		pacman -S htop glances tiptop perf iotop strace lsof
 		pacman -S mc
 		pacman -S tmux
 		pacman -S util-linux gdisk parted gparted
@@ -546,7 +546,7 @@
 		dd, truncate
 		# all filesystem objects (folders, devices, etc.) are files
 		# you can use ctrl+c, ctrl+d, ctrl+z and other hotkeys
-		# you can redirect I/O streams with >, >>, <
+		# you can redirect I/O/E streams with >, >>, < or merge them with 2>&1, 1>>&2, etc. (0 - I, 1 - O, 2 - E)
 		# you can use autocompletion with TAB
 		# you can use <space><command> instead of <command> to not write history
 		# you can use ctrl+alt+delete to reboot the machine
@@ -580,6 +580,7 @@
 		htop # system status ans process management
 		pstree # tree of processes
 		ps # currently running processes
+		glances # an eye on your system
 		fuser # network using by processes
 		free # RAM usage
 		df # disk usage
@@ -604,6 +605,7 @@
 		cat /etc/services # shows used by services ports
 		touch <file> # change file timestamps to current moment
 		time <program> # time of program running
+		debugfs # ext2/ext3/ext4 filesystem debugger
 		### network info
 			ip
 			iw
@@ -1246,6 +1248,7 @@
 		sudo python3.7 -m ensurepip
 		sudo pip install --upgrade pip
 	## unresolved bugs
+		# sudden touchpad disconnection
 		# wrong password timeout problem
 		# tty control keys problem
 		# mute LED problem
