@@ -155,6 +155,7 @@
 				##### GUI
 					pacman -S bbswitch acpi_call
 					optimus-manager-qt # install from AUR
+					# setup optimus-manager-qt to use bbswitch as switching method
 			#### Nvidia PRIME
 				pacman -S nvidia-prime
 				prime-run <program>
@@ -232,7 +233,7 @@
 			Enpass # install from AUR (enpass-bin) # or Bitwarden (bitwarden-bin)
 	## software development kit
 		### languages
-			pacman -S gcc gdb clang
+			pacman -S gcc clang gdb
 			pacman -S nasm binutils
 			pacman -S python python-pip
 			pacman -S rust
@@ -249,9 +250,9 @@
 		### text editors
 			pacman -S notepadqq # Qt clone of Notepad++
 		### IDEs
-			pacman -S emacs vim
+			pacman -S vim emacs
+			pacman -S kdevelop qtcreator
 			pacman -S code # or install from AUR (visual-studio-code-bin)
-			pacman -S kdevelop qt5 qtcreator
 			pacman -S arduino arduino-docs arduino-avr-core
 			pacman -S processing
 		### utilities
@@ -606,6 +607,7 @@
 		touch <file> # change file timestamps to current moment
 		time <program> # time of program running
 		debugfs # ext2/ext3/ext4 filesystem debugger
+		ext4undelete ntfsundelete # undelete files
 		### network info
 			ip
 			iw
@@ -835,6 +837,8 @@
 				6. Btrfs - the highest performance, conditionally stable, functionable, under development.
 		### ram cache optimization
 			nano /etc/sysctl.d/99-sysctl.conf # set "vm.vfs_cache_pressure=500" (from 0 to 1000 inversely to RAM volume)
+		### flush pagecache, dentries and inodes
+			free -m && sync && echo 3 > /proc/sys/vm/drop_caches && free -m
 	## additional devices
 		### use PS controller as XBox
 			xboxdrv
@@ -1249,9 +1253,10 @@
 		sudo pip install --upgrade pip
 	## unresolved bugs
 		# sudden touchpad disconnection
-		# wrong password timeout problem
-		# tty control keys problem
-		# mute LED problem
+		# volume hotkeys crash KDE Plasma
+		# cannot change wrong password timeout
+		# tty special keys not working
+		# mute LED not working
 #
 
 
