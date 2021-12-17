@@ -234,16 +234,10 @@
 	## software development kit
 		### languages
 			pacman -S gcc clang gdb
+			pacman -S rust
 			pacman -S nasm binutils
 			pacman -S python python-pip
-			pacman -S rust
-			pacman -S dlang-dmd dtools gdc
-			pacman -S ghc
-			pacman -S gcc-ada
-			pacman -S erlang
-			pacman -S lua
-			pacman -S perl
-			pacman -S ruby
+			pacman -S ghc gcc-ada erlang perl clisp lua
 			pacman -S android-tools android-udev
 		### build systems
 			pacman -S ninja make cmake scons gradle
@@ -347,7 +341,7 @@
 			ifuse -o allow_other <mount_directory> # mount iOS device
 		### science and education
 			pacman -S geogebra # mathematics
-			pacman -S celestia stellarium  # astronomy
+			pacman -S stellarium celestia # astronomy
 			pacman -S step # physics
 			qucs # install from AUR # electronics
 			pacman -S python-biopython # bioinformatics
@@ -645,6 +639,10 @@
 			# now you can remove this directory
 			#### list packages installed localy
 				pacman -Qm
+			#### AUR helpers
+				rua # install from AUR
+				aurutils  # install from AUR
+				pacman -D --asexplicit <package> # to set package installation reason to explicit if using AUR helpers
 		### downgrading packages
 			nano /etc/pacman.d/mirrorlist <# replace with
 				Server=https://archive.archlinux.org/repos/<year>/<mounth>/<day>/$repo/os/$arch
@@ -1254,6 +1252,7 @@
 	## unresolved bugs
 		# sudden touchpad disconnection
 		# volume hotkeys crash KDE Plasma
+		# KDE Plasma menu freezing
 		# cannot change wrong password timeout
 		# tty special keys not working
 		# mute LED not working
