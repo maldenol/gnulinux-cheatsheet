@@ -126,17 +126,28 @@
 		useradd -m <user>
 		passwd <user>
 		nano /etc/sudoers # add "<user> ALL=(ALL) ALL" to give user privileged rights
-	## Xorg + SDDM + KDE Plasma
-		pacman -S choose xf86-video-fbdev xf86-video-intel xf86-video-amdgpu xf86-video-nouveau
-		pacman -S xorg xorg-xinit
-		pacman -S plasma plasma-wayland-session
-		pacman -S kde-applications # if you need KDE applications
-		pacman -S konsole ark dolphin filelight # if not installed yet
-		pacman -S powerdevil plasma-nm plasma-browser-integration kwalletmanager kaccounts-providers packagekit-qt5 discover kmix spectacle kdeconnect
-		pacman -S sddm sddm-kcm
-		systemctl enable --now sddm
-		# you can also use another desktop environment like Xfce, Gnome or window manager like Openbox instead of KDE Plasma
-		# you can also use another display manager like LightDM, GDM or do without it
+	## graphical environment
+		### graphical server
+			#### Xorg
+				pacman -S choose xf86-video-fbdev xf86-video-intel xf86-video-amdgpu xf86-video-nouveau
+				pacman -S xorg xorg-xinit
+			#### Wayland
+				pacman -S wayland
+		### desktop environment
+			#### KDE Plasma
+				pacman -S plasma plasma-wayland-session
+				pacman -S kde-applications # if you need KDE applications
+				pacman -S konsole ark dolphin filelight # if not installed yet
+				pacman -S powerdevil plasma-nm plasma-browser-integration kwalletmanager kaccounts-providers packagekit-qt5 discover kmix spectacle kdeconnect
+			# you can also use another desktop environment like Xfce, Gnome or window manager like Openbox instead of KDE Plasma
+		#### SDDM
+			pacman -S sddm sddm-kcm
+			systemctl enable --now sddm
+			nano /etc/sddm.conf <# write the following
+				[General]
+				Numlock=on
+			#>
+			# you can also use another display manager like LightDM, GDM or do without it
 	## security
 		pacman -S iptables
 		systemctl enable --now iptables
@@ -148,7 +159,9 @@
 			pacman -S nvidia nvidia-utils lib32-nvidia-utils nvidia-settings opencl-nvidia lib32-opencl-nvidia opencl-headers # or "nvidia-390xx-dkms" (or "nvidia-340xx-dkms') instead of "nvidia" for unsupported graphics cards
 			#### Optimus Manager
 				optimus-manager # install from AUR
+				# no Wayland support
 				nano /etc/sddm.conf # comment "DisplayCommand" and "DisplayStopCommand"
+				# you can also add "optimus-manager.startup=<mode>" to kernel parameters
 				systemctl enable optimus-manager.service # and reboot
 				optimus-manager --switch <intel|nvidia|hybrid|auto> # switch graphics card
 				optimus-manager --set-startup <intel|nvidia|hybrid|auto> # switch graphics card on startup
@@ -166,7 +179,7 @@
 			pacman -S xf86-video-amdgpu # install Mesa
 			pacman -S vulkan-radeon lib32-vulkan-radeon vulkan-mesa-layer # Vulkan
 		### libs
-			pacman -S mesa lib32-mesa mesa-demos opengl-man-pages libva-mesa-driver lib32-libva-mesa-driver mesa-vdpau lib32-mesa-vdpau opencl-mesa # Mesa
+			pacman -S mesa lib32-mesa mesa-demos mesa-utils opengl-man-pages libva-mesa-driver lib32-libva-mesa-driver mesa-vdpau lib32-mesa-vdpau opencl-mesa # Mesa
 			pacman -S vulkan-icd-loader lib32-vulkan-icd-loader vulkan-headers vulkan-validation-layers vulkan-tools # Vulkan
 			pacman -S openal # OpenAL
 		### sound
@@ -233,7 +246,7 @@
 			Enpass # install from AUR (enpass-bin) # or Bitwarden (bitwarden-bin)
 	## software development kit
 		### languages
-			pacman -S gcc clang gdb
+			pacman -S gcc clang
 			pacman -S rust
 			pacman -S nasm binutils
 			pacman -S python python-pip
@@ -241,8 +254,9 @@
 			pacman -S android-tools android-udev
 		### build systems
 			pacman -S ninja make cmake scons gradle
-		### text editors
+		### editors
 			pacman -S notepadqq # Qt clone of Notepad++
+			pacman -S ghex hexedit
 		### IDEs
 			pacman -S vim emacs
 			pacman -S kdevelop qtcreator
@@ -250,7 +264,8 @@
 			pacman -S arduino arduino-docs arduino-avr-core
 			pacman -S processing
 		### utilities
-			pacman -S binutils valgrind cscope perf strace pahole
+			pacman -S binutils gdb valgrind perf strace trace-cmd
+			pacman -S cppcheck pahole cscope # C++ only
 			pacman -S git
 			pacman -S ccache distcc
 			oclint # install from AUR
@@ -298,8 +313,6 @@
 		pacman -S transmission-qt ktorrent
 		pacman -S translate-shell # usage trans
 		pacman -S youtube-dl youtube-viewer
-		wps-office # install from AUR # or LibreOffice or Apache OpenOffice
-		ttf-wps-fonts # install from AUR
 		pacman -S playonlinux
 		pacman -S newsboat
 		pacman -S chntpw flashrom
@@ -339,6 +352,19 @@
 			ifuse # install from AUR
 			idevicepair pair # pair connected unlocked iOS device
 			ifuse -o allow_other <mount_directory> # mount iOS device
+		### emulators
+			pacman -S wine wine-mono wine-gecko # for Windows
+			pacman -S dosbox # for DOS
+			pacman -S dolphin-emu # for Nintendo Wii
+			yuzu # install from AUR (yuzu-mainline-git) # for Nintendo Switch
+		### Java
+			pacman -S java-runtime-common java-environment-common jdk-openjdk
+		### Office
+			#### Libre
+				pacman -S libreoffice-still
+			#### WPS
+				wps-office # install from AUR # or LibreOffice or Apache OpenOffice
+				ttf-wps-fonts # install from AUR
 		### science and education
 			pacman -S geogebra # mathematics
 			pacman -S stellarium celestia # astronomy
@@ -350,13 +376,6 @@
 		### Remote Desktop
 			pacman -S remmina
 			teamviewer # install from AUR # run teamviewerd.service
-		### emulators
-			pacman -S wine wine-mono wine-gecko # for Windows
-			pacman -S dosbox # for DOS
-			pacman -S dolphin-emu # for Nintendo Wii
-			yuzu # install from AUR (yuzu-mainline-git) # for Nintendo Switch
-		### Java
-			pacman -S java-runtime-common java-environment-common jdk-openjdk
 		### games
 			#### Steam
 				pacman -S steam
@@ -678,6 +697,7 @@
 			Icon=<icon>
 			Type=<type>
 		#>
+		# use "/usr/share/wayland-sessions/" instead of "/usr/share/xsessions/" for Wayland
 	## run GUI application in KDE Plasma as root
 		kdesu <application>
 	## run GUI application over ssh as root
@@ -716,7 +736,7 @@
 		ffplay <input_device_or_file> # watch input device or file
 	## cron
 		nano /etc/crontab # enter "<minute> <hour> <day_of_month> <month> <day_of_week> <command_or_script>" (* to all, */n to every n, a,b to several)
-	## enable numlock at logon
+	## enable numlock at logon (deprecated)
 		pacman -S numlockx
 		nano ~/.bash_profile # add "numlockx &"
 	## suspending the system
@@ -1249,6 +1269,8 @@
 		sudo rm -rf /usr/lib/python3.7/<problem_directory>
 		sudo python3.7 -m ensurepip
 		sudo pip install --upgrade pip
+	## HP UEFI boots from 2nd EFI partition (Windows) instead of 1st (GRUB2)
+		# rename /EFI/Microsoft/Boot/bootmgfw.efi
 	## unresolved bugs
 		# sudden touchpad disconnection
 		# volume hotkeys crash KDE Plasma
