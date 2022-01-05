@@ -269,6 +269,13 @@
 			pacman -S git
 			pacman -S ccache distcc
 			oclint # install from AUR
+		### GameDev
+			PhysX # install from AUR (physx)
+			pacman -S godot
+			Unity Hub # install from AUR (unityhub)
+			Unreal Engine # install from AUR (unreal-engine)
+			Serious Engine # install from AUR (serious-engine-git)
+			pacman -S blender
 		### databases
 			#### SQLite
 				pacman -S sqlite3
@@ -285,22 +292,20 @@
 				sudo systemctl enable --now postgresql
 				createuser <username>
 				psql -U <username> # "postgres" is database root username
-		### other
-			Unity Engine # install from AUR (unity-editor)
-			pacman -S blender
-			Eclipse Papyrus # install from AUR (papyrus)
+		### DevOps
+			pacman -S jeankins
+			teamcity # install from AUR
+			pacman -S ansible puppet salt
+			chef-workstation chef-client # install from AUR
+			pacman -S vagrant
+			pacman -S prometheus grafana
+			pacman -S docker # enable and start service
+			docker-swarm # install from AUR
+			pacman -S kubectl
+			rancher/cattle # download from GitHub
 			pacman -S nginx
-			#### DevOps
-				pacman -S jeankins
-				teamcity # install from AUR
-				pacman -S ansible puppet salt
-				chef-workstation chef-client # install from AUR
-				pacman -S vagrant
-				pacman -S prometheus grafana
-				pacman -S docker # enable and start service
-				docker-swarm # install from AUR
-				pacman -S kubectl
-				rancher/cattle # download from GitHub
+			Eclipse Papyrus # install from AUR (papyrus)
+			pacman -S doxygen
 	## other
 		pacman -S htop glances tiptop perf iotop strace lsof
 		pacman -S mc
@@ -360,11 +365,11 @@
 		### Java
 			pacman -S java-runtime-common java-environment-common jdk-openjdk
 		### Office
-			#### Libre
-				pacman -S libreoffice-still
-			#### WPS
+			#### WPS Office
 				wps-office # install from AUR # or LibreOffice or Apache OpenOffice
 				ttf-wps-fonts # install from AUR
+			#### Libre Office
+				pacman -S libreoffice-still
 		### science and education
 			pacman -S geogebra # mathematics
 			pacman -S stellarium celestia # astronomy
@@ -654,6 +659,7 @@
 			git clone https://aur.archlinux.org/<package>.git
 			cd <package>
 			makepkg s
+			# install required packages with "sudo pacman -Sy --asdeps <packages>"
 			sudo pacman -U <package> # <package> is name of arhive <package>-<vesrion>.tar.xz (or .tar.gz)
 			# now you can remove this directory
 			#### list packages installed localy
@@ -1278,6 +1284,7 @@
 		# cannot change wrong password timeout
 		# tty special keys not working
 		# mute LED not working
+		# no way to run MS Office or MS Visual Studio
 #
 
 
