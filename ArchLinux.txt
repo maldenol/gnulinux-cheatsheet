@@ -563,7 +563,7 @@
         exec
         factor, expr
         dd, truncate
-        # all filesystem objects (folders, devices, etc.) are files
+        # all filesystem objects (common files, directories, devices, sockets, etc.) are file descriptors
         # you can use ctrl+c, ctrl+d, ctrl+z and other hotkeys
         # you can redirect I/O/E streams with >, >>, < or merge them with 2>&1, 1>>&2, etc. (0 - I, 1 - O, 2 - E)
         # you can use autocompletion with TAB
