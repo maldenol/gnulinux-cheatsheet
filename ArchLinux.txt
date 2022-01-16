@@ -270,12 +270,12 @@
             pacman -S ccache distcc
             oclint # install from AUR
         ### GameDev
-            PhysX # install from AUR (physx)
             pacman -S godot
             Unity Hub # install from AUR (unityhub)
             Unreal Engine # install from AUR (unreal-engine)
             Serious Engine # install from AUR (serious-engine-git)
             pacman -S blender
+            PhysX # install from AUR (physx)
         ### databases
             #### SQLite
                 pacman -S sqlite3
