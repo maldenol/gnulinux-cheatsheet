@@ -403,6 +403,7 @@
             pacman -S openssh sshfs fail2ban
         ### OpenVPN
             pacman -S openvpn easy-rsa
+            pacman -S networkmanager-openvpn
         ### network management
             # you can use Endian Firewall, Kerio Control, ClearOS as firewall
             # you can use zabbix, icinga, monitorix as monitoring panel
@@ -1278,9 +1279,6 @@
     ## HP UEFI boots from 2nd EFI partition (Windows) instead of 1st (GRUB2)
         # rename /EFI/Microsoft/Boot/bootmgfw.efi
     ## unresolved bugs
-        # sudden touchpad disconnection
-        # volume hotkeys crash KDE Plasma
-        # KDE Plasma menu freezing
         # cannot change wrong password timeout
         # tty special keys not working
         # mute LED not working
