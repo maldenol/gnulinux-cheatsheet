@@ -270,9 +270,9 @@
             pacman -S ccache distcc
             oclint # install from AUR
         ### GameDev
-            pacman -S godot
+            Unreal Engine 4 # install from AUR (unreal-engine)
             Unity Hub # install from AUR (unityhub)
-            Unreal Engine # install from AUR (unreal-engine)
+            pacman -S godot
             Serious Engine # install from AUR (serious-engine-git)
             pacman -S blender
             PhysX # install from AUR (physx)
@@ -345,7 +345,7 @@
                 nano /etc/default/grub # add "threadirqs" to linux-rt kernel parameters
                 pacman -S lmms ardour guitarix # LMMS looks like FL Studio and Guitarix looks like Guitar Rig for Windows
             #### graphics
-                pacman -S gimp kolourpaint
+                pacman -S convert kolourpaint gimp
             #### ffmpeg
                 pacman -S ffmpeg v4l2loopback-dkms
         ### bluetooth
