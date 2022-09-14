@@ -607,7 +607,6 @@
         hdparm # hard drive parameters
         uname # system information
         uptime # system uptime
-        vmstat # virtual memory statistics
         iotop # I/O info
         lsblk # list of hard disks
         blkid # partitions' ids
@@ -615,7 +614,14 @@
         lscpu # info about processors
         lspci # list of pci devices
         lstopo # host topology
+        dmidecode # DMI table decoder
+        vmstat # virtual memory statistics
         glxinfo # video driver info
+        intel_gpu_top # display a top-like summary of Intel GPU usage
+        radeontop # tool to show GPU utilization
+        nvidia-smi # NVIDIA System Management Interface program
+        nvtop # interactive GPU process viewer
+        upower # UPower command line tool
         w # shows who is logged in on and what they are doing
         who # shows who is logged in and from where
         last # shows login chronology
