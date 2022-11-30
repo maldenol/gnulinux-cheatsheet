@@ -569,6 +569,7 @@
         # you can redirect I/O/E streams with >, >>, < or merge them with 2>&1, 1>>&2, etc. (0 - I, 1 - O, 2 - E)
         # you can use autocompletion with TAB
         # you can use <space><command> instead of <command> to not write history
+        # you can use !<number> to execute <number>'th command from history
         # you can use ctrl+alt+delete to reboot the machine
         # you can use ctrl+alt+break to terminate Xorg server
         # you can use alt+SysRq+<key> to send a low-level command to the kernel
@@ -633,18 +634,24 @@
         time <program> # time of program running
         debugfs # ext2/ext3/ext4 filesystem debugger
         ext4undelete ntfsundelete # undelete files
+        cat less tail head cut paste join split grep sed uniq sort nl wc # text processing
+        tee xargs # output redirecting
+        top ps bg fg kill killall pgrep pkill pwait nice renice # process control
+        useradd userdel usermod passwd groupadd groupdel chown chgrp chmod # user moderation
+        lvm lvs lvcreate lvremove vgs vgcreate vgremove # LVM
+        losetup # loopback device setup
         ### network info
             ip
             iw
             ping
-            traceroute
+            traceroute, tracepath
             arp
             route
             netstat
             ss
-            dig, nslookup
-            dnsmap
+            dig, nslookup, host
             tcpdump
+            dnsmap
             wol
         ### software development info
             objdump -D <executable_file> # full disassembling
@@ -673,7 +680,7 @@
                 pacman -Qm
             #### AUR helpers
                 rua # install from AUR
-                aurutils  # install from AUR
+                aurutils # install from AUR
                 pacman -D --asexplicit <package> # to set package installation reason to explicit if using AUR helpers
         ### downgrading packages
             nano /etc/pacman.d/mirrorlist <# replace with
