@@ -329,9 +329,11 @@
             secure-delete # install from AUR
         ### web
             pacman -S chromium firefox
+        ### messangers
             pacman -S telegram-desktop
             viber # install from AUR
             pacman -S discord
+            slack-desktop # install from AUR
         ### media
             spotify # install from AUR
             pacman -S vlc kaffeine # for multimedia
@@ -381,6 +383,7 @@
         ### Remote Desktop
             pacman -S remmina
             teamviewer # install from AUR # run teamviewerd.service
+            parsec # install from AUR (parsec-bin)
         ### games
             #### Steam
                 pacman -S steam
