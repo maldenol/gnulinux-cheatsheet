@@ -259,7 +259,8 @@
             pacman -S ghex hexedit
         ### IDEs
             pacman -S vim emacs
-            pacman -S kdevelop qtcreator
+            clion # install from AUR
+            pacman -S qtcreator
             pacman -S code # or install from AUR (visual-studio-code-bin)
             pacman -S arduino arduino-docs arduino-avr-core
             pacman -S processing
@@ -662,6 +663,7 @@
             ldd <executable_file> # list dynamic libraries dependencies
             readelf -a <executable_file> # show ELF-file information
             nm <executable_file> # list symbols
+            strings # print the strings of printable characters in files
     ## ArchLinux package manager utilities
         man pacman
         pacman -Syu # upgrade packages
